@@ -68,13 +68,13 @@ class RNPicker extends Component {
     this.setModalVisible(false);
   }
 
-  onPressConfirm() {
-    this.datePicked();
-    this.setModalVisible(false);
+  onValueChange(item) {
+    this.setState({ selected: item });
   }
 
-  onPress() {
-    this.setModalVisible(true);
+  onPressConfirm() {
+    this.props.onValueChange(this.state.selected);
+    this.setModalVisible(false);
   }
 
   render() {
@@ -103,7 +103,7 @@ class RNPicker extends Component {
       <TouchableHighlight
         style={[Style.dateTouch, style]}
         underlayColor={'transparent'}
-        onPress={this.onPressDate}
+        onPress={() => this.setModalVisible(true)}
       >
         <View style={[Style.dateTouchBody, customStyles.dateTouchBody]}>
           <View style={dateInputStyle}>
@@ -113,7 +113,7 @@ class RNPicker extends Component {
             style={[Style.dateIcon, customStyles.dateIcon]}
             source={iconSource}
           />}
-          {Platform.OS === 'ios' && <Modal
+          <Modal
             transparent={true}
             visible={this.state.modalVisible}
             onRequestClose={() => {this.setModalVisible(false);}}
@@ -137,9 +137,10 @@ class RNPicker extends Component {
                     <Picker
                       style={[Style.datePicker, customStyles.datePicker]}
                       selectedValue={this.state.selected}
-                      onValueChange={this.onValueChange.bind(this, 'selected1')}>
-                      <Item label="hello" value="key0" />
-                      <Item label="world" value="key1" />
+                      onValueChange={item => this.onValueChange(item)}>
+                      {this.props.values.map((item, i) => (
+                        <Picker.Item key={`pickerItem${i}`}  {...item} />
+                      ))}
                     </Picker>
                     <TouchableHighlight
                       underlayColor={'transparent'}
@@ -163,7 +164,7 @@ class RNPicker extends Component {
                 </TouchableHighlight>
               </TouchableHighlight>
             </View>
-          </Modal>}
+          </Modal>
         </View>
       </TouchableHighlight>
     );
@@ -197,6 +198,8 @@ RNPicker.propTypes = {
   placeholder: React.PropTypes.string,
   modalOnResponderTerminationRequest: React.PropTypes.func,
   renderTitle: React.PropTypes.func,
+  values: React.PropTypes.array,
+  onValueChange: React.PropTypes.func,
 };
 
 export default RNPicker;
